@@ -1,0 +1,3 @@
+[submodule "depend/glfw"]
+	path = depend/glfw
+	url = git@github.com:letsudo/glfw.git
