@@ -1,11 +1,11 @@
 #!bin/bash
 root=$(cd $(dirname $0); pwd)
 
-rm -rf build
-if [ ! -d build ]; then
-    mkdir build
+rm -rf demo
+if [ ! -d demo ]; then
+    mkdir demo
 fi
-cd build
+cd demo
 cmake ..
 make 
 ./learn_opengl
