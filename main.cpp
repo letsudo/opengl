@@ -115,14 +115,15 @@ int main()
     // };
     float vertices[] = {
         // 位置              // 颜色
-        0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 右下
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // 左下
-        0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // 顶部
+        0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,   // top left 
     };
-    // unsigned int indices[] = {  // note that we start from 0!
-    //     0, 1, 3,  // first Triangle
-    //     1, 2, 3   // second Triangle
-    // };
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 3,  // first Triangle
+        1, 2, 3   // second Triangle
+    };
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO); //存储vbo和ebo的属性的buffer
     glGenBuffers(1, &VBO); //存储点的buffer
@@ -151,8 +152,8 @@ int main()
      */
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     /**
      * @brief 设置链接顶点属性 告诉OpenGL如何把顶点数据链接到顶点着色器的顶点属性上 接口:(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
      * @param 0 index 第一个参数指定我们要配置的顶点属性。还记得我们在顶点着色器中使用layout(location = 0)定义了position顶点属性的位置值(Location)吗？它可以把顶点属性的位置值设置为0。因为我们希望把数据传递到这一个顶点属性中，所以这里我们传入0。
@@ -174,10 +175,6 @@ int main()
     glEnableVertexAttribArray(0);
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
-    /**
-     * @brief 以顶点属性位置值0作为参数，启用顶点属性, 顶点属性默认是禁用的。
-     * 
-     */
     glEnableVertexAttribArray(1);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
@@ -223,7 +220,7 @@ int main()
          * @param 0 第二个参数指定了顶点数组的起始索引，我们这里填0。
          * @param 最后一个参数指定我们打算绘制多少个顶点，这里是6
          */
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        // glDrawArrays(GL_TRIANGLES, 0, 6);
         /**
          * @brief 从索引缓冲渲染 (GLenum mode, GLsizei count, GLenum type, const void *indices);
          * @param GL_TRIANGLES 第一个参数指定了我们绘制的模式，这个和glDrawArrays的一样
@@ -231,7 +228,7 @@ int main()
          * @param GL_UNSIGNED_INT 第三个参数是索引的类型，这里是GL_UNSIGNED_INT
          * @param 0 最后一个参数里我们可以指定EBO中的偏移量
          */
-        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind it every time 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
