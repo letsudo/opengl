@@ -3,6 +3,10 @@
 
 #include <iostream>
 #include "shader.hpp"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
@@ -46,7 +50,7 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader ourshader("./../shader/3.3_shader.vs", "./../shader/3.3_shader.fs");
+    Shader ourshader("./../shader/shader.vs", "./../shader/shader.fs");
 
     int nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
@@ -54,10 +58,10 @@ int main()
 
     float vertices[] = {
         // 位置              // 颜色
-        0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f,   // top left 
+        0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f,// top right
+        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,// bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f,// bottom left
+        -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f,// top left 
     };
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 3,  // first Triangle
@@ -105,11 +109,14 @@ int main()
      * 而具体是从哪个VBO（程序中可以有多个VBO）获取则是通过在调用glVertexAttribPointer时绑定到GL_ARRAY_BUFFER的VBO决定的
      * 由于在调用glVertexAttribPointer之前绑定的是先前定义的VBO对象，顶点属性0现在会链接到它的顶点数据。
      */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3* sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2,2,GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)) );
+    glEnableVertexAttribArray(2);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0); 
@@ -121,6 +128,29 @@ int main()
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0); 
+
+    //Gen texture
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_REPEAT);
+
+    //Load image
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load("./../res/pics/wall.jpeg", &width, &height, &nrChannels, 0);
+    if(data){
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }else{
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+
+
 
 
     // uncomment this call to draw in wireframe polygons.
@@ -146,7 +176,7 @@ int main()
         // float greenValue = sin(timeValue) / 2.0f + 0.5f;
         // int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         /**
          * @brief (GLenum mode, GLint first, GLsizei count);
