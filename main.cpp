@@ -226,6 +226,20 @@ int main()
     }
     stbi_image_free(data);
 
+
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f), 
+        glm::vec3( 2.0f,  5.0f, -15.0f), 
+        glm::vec3(-1.5f, -2.2f, -2.5f),  
+        glm::vec3(-3.8f, -2.0f, -12.3f),  
+        glm::vec3( 2.4f, -0.4f, -3.5f),  
+        glm::vec3(-1.7f,  3.0f, -7.5f),  
+        glm::vec3( 1.3f, -2.0f, -2.5f),  
+        glm::vec3( 1.5f,  2.0f, -2.5f), 
+        glm::vec3( 1.5f,  0.2f, -1.5f), 
+        glm::vec3(-1.3f,  1.0f, -1.5f)  
+    };
+
     
 
 
@@ -254,10 +268,9 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
         // draw our first triangle
@@ -265,8 +278,6 @@ int main()
 
         // unsigned int transformLoc = glGetUniformLocation(ourshader.ID, "transform");
         // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-        int modelLoc = glGetUniformLocation(ourshader.ID, "model");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         int viewLoc = glGetUniformLocation(ourshader.ID, "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         int projectionLoc = glGetUniformLocation(ourshader.ID, "projection");
@@ -279,23 +290,30 @@ int main()
         // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        /**
-         * @brief (GLenum mode, GLint first, GLsizei count);
-         * @param GL_TRIANGLES 第一个参数是我们打算绘制的OpenGL图元的类型
-         * @param 0 第二个参数指定了顶点数组的起始索引，我们这里填0。
-         * @param 最后一个参数指定我们打算绘制多少个顶点，这里是6
-         */
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        /**
-         * @brief 从索引缓冲渲染 (GLenum mode, GLsizei count, GLenum type, const void *indices);
-         * @param GL_TRIANGLES 第一个参数指定了我们绘制的模式，这个和glDrawArrays的一样
-         * @param 6 第二个参数是我们打算绘制顶点的个数，这里填6，也就是说我们一共需要绘制6个顶点
-         * @param GL_UNSIGNED_INT 第三个参数是索引的类型，这里是GL_UNSIGNED_INT
-         * @param 0 最后一个参数里我们可以指定EBO中的偏移量
-         */
-        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // glBindVertexArray(0); // no need to unbind it every time 
-
+        for (size_t i = 0; i < 10; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::translate(model, cubePositions[i]);
+            int modelLoc = glGetUniformLocation(ourshader.ID, "model");
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+            /**
+             * @brief (GLenum mode, GLint first, GLsizei count);
+             * @param GL_TRIANGLES 第一个参数是我们打算绘制的OpenGL图元的类型
+             * @param 0 第二个参数指定了顶点数组的起始索引，我们这里填0。
+             * @param 最后一个参数指定我们打算绘制多少个顶点，这里是6
+             */
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            /**
+             * @brief 从索引缓冲渲染 (GLenum mode, GLsizei count, GLenum type, const void *indices);
+             * @param GL_TRIANGLES 第一个参数指定了我们绘制的模式，这个和glDrawArrays的一样
+             * @param 6 第二个参数是我们打算绘制顶点的个数，这里填6，也就是说我们一共需要绘制6个顶点
+             * @param GL_UNSIGNED_INT 第三个参数是索引的类型，这里是GL_UNSIGNED_INT
+             * @param 0 最后一个参数里我们可以指定EBO中的偏移量
+             */
+            // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            // glBindVertexArray(0); // no need to unbind it every time 
+        }
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
