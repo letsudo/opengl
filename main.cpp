@@ -159,8 +159,11 @@ int main()
     glEnableVertexAttribArray(0);
     std::string texture_path = "./../res/pics/container2.png";
     unsigned int diffuseMap = loadTexture(texture_path.c_str());
+    std::string texture_specular_path = "./../res/pics/container2_specular.png";
+    unsigned int specularMap = loadTexture(texture_specular_path.c_str());
     lightingShader.use(); 
     lightingShader.setInt("material.diffuse", 0);
+    lightingShader.setInt("material.specular", 1);
 
     // render loop
     // -----------
@@ -216,6 +219,9 @@ int main()
          // bind diffuse map
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
 
         // render the cube
         glBindVertexArray(cubeVAO);
